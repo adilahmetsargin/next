@@ -1,84 +1,142 @@
 # Next Role
 
-Adil için mobil öncelikli frontend iş arama uygulaması. React + TypeScript + Vite; Netlify Functions. Hesap/veritabanı gerektirmez.
+A mobile-first workspace for discovering frontend jobs, tracking applications, and preparing tailored application documents.
 
-## Netlify'da yayınlama
+Built with React, TypeScript, Vite, and Netlify Functions. Application data stays in the browser, and AI-assisted writing is optional.
 
-1. Bu klasörün içeriğini bir GitHub reposunun köküne koy. `package.json`, `netlify.toml`, `src` ve `netlify/functions` aynı kökte olmalı. `node_modules` yükleme.
-2. Netlify'da **Add new project → Import an existing project → GitHub** ile repoyu seç.
-3. Base directory: boş (repo kökü). Build command: `npm run build`. Publish directory: `dist`. Functions directory: `netlify/functions`. Node: 22. `netlify.toml` bunları tanımlar.
-4. Deploy tamamlanınca site adresini telefonda aç. Tarayıcının Paylaş / menü seçeneğinden **Ana Ekrana Ekle** kullanabilirsin.
-5. Profil ekranına e-posta ve telefonunu gir; temel CV'yi kontrol et. İstersen teslim edilen `Adil-Next-Role-Profile.json` dosyasını **Profil → Yedek / profil içe aktar** ile yükle. Bu özel dosyayı GitHub reposuna veya site klasörüne koyma.
+## Features
 
-**Sadece `dist` klasörünü Netlify Drop'a sürüklemek yeterli değildir:** ilan ve AI uçları Netlify Functions gerektirir. Git tabanlı deploy kullan. Henüz Netlify'a yayınlanmış bir site teslim edilmiyor; yerel kaynak ve test edilmiş build teslim ediliyor.
+- Job discovery from Himalayas, Remotive, and configurable Greenhouse boards.
+- Rule-based matching with visible skill overlaps, gaps, and location considerations.
+- Search, date filters, seniority controls, and saved jobs.
+- Application tracking with status updates and notes.
+- Manual job entry for listings found elsewhere.
+- Editable cover letter templates and resume bullet prioritization without an API key.
+- Optional Gemini integration for document rewriting.
+- Client-side PDF and text exports.
+- JSON backup and import for moving data between browsers.
+- Responsive layouts and a web app manifest for home-screen installation.
 
-Netlify Free plan limitleri içinde kullanılabilir; sınırsız ücretsiz hosting iddiası yoktur. Kullanım/deploy kredilerini Netlify hesabından kontrol et. AI sağlayıcısının kotası Netlify'dan ayrıdır.
+## Getting started
 
-## Yerelde çalıştırma
+### Requirements
 
-Node 22.13+ önerilir.
+- Node.js 22.13 or newer.
+- npm.
 
 ```sh
 npm ci
 npm run dev
 ```
 
-`http://127.0.0.1:5173` adresini aç. Vite development middleware'i aynı Netlify fonksiyonlarını yerelde çalıştırır. `npm run preview` yalnızca statik build sunar; API'ler için `npm run dev` veya Netlify ortamı kullan.
+The development server runs at `http://127.0.0.1:5173`. Its middleware exposes the same handlers used by Netlify Functions.
 
-```sh
-npm test
-npm run build
+### Commands
+
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Start the application and local API handlers. |
+| `npm test` | Run matching, data handling, and authorization tests. |
+| `npm run build` | Type-check and create the production build. |
+| `npm run preview` | Preview static build output; API handlers are not included. |
+
+The Profile screen contains an editable base resume and matching preferences. The repository includes a generic profile template with no personal work history or contact information.
+
+## Configuration
+
+Copy `.env.example` to `.env` for local development. In production, configure variables in Netlify with Functions access and redeploy after changes.
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `GEMINI_API_KEY` | For AI generation | Server-side Gemini API key. |
+| `APP_ACCESS_TOKEN` | For AI generation | Private access code protecting the generation endpoint. |
+| `GEMINI_MODEL` | No | GenerateContent model; defaults to `gemini-3.5-flash-lite`. |
+| `HIMALAYAS_API_KEY` | No | Optional API key for higher provider quotas. |
+| `GREENHOUSE_BOARDS` | No | Comma-separated board tokens, up to five; defaults to `lumimeds,onetrust`. |
+
+### AI generation
+
+Template mode works without external AI credentials. It creates cover letters from existing experience and reorders resume bullets by relevance without adding new claims.
+
+AI generation becomes available when both `GEMINI_API_KEY` and `APP_ACCESS_TOKEN` are configured. The access token should be a strong random value of at least 32 characters. Enter that token in **Profile → Your AI access code**, then select **Tailor with AI** in Documents.
+
+The provider API key stays on the server. The access code is stored only for the browser tab session. Neither secret should use a `VITE_` prefix, which would expose it to the client bundle.
+
+AI requests send the candidate profile, resume, and selected job description to Google. Generated documents and explanatory notes are requested in English. Output requires review for factual accuracy. Provider availability, quotas, and charges depend on the configured account. The shared access code is intended for a personal deployment, not multi-user authentication.
+
+## Deployment
+
+The included `netlify.toml` defines the deployment settings:
+
+| Setting | Value |
+| --- | --- |
+| Build command | `npm run build` |
+| Publish directory | `dist` |
+| Functions directory | `netlify/functions` |
+| Node.js version | `22` |
+
+Connect the repository through Netlify's Git integration with the base directory set to the repository root. Static-only deployment of `dist` does not include the job or AI handlers.
+
+After deployment, supported mobile browsers can add the application to the home screen. Hosting usage and AI provider quotas are billed or limited independently.
+
+## Job discovery and matching
+
+### Sources
+
+| Source | Coverage and behavior |
+| --- | --- |
+| [Himalayas](https://himalayas.app/api) | First 20 results for each US-filtered search: `frontend`, `react`, and `next.js`. Duplicate roles are merged and expired listings are excluded. Application links and attribution are preserved. |
+| [Remotive](https://github.com/remotive-com/remote-jobs-api) | Software development feed filtered for relevant roles. Listings are delayed by 24 hours under the provider's terms. |
+| [Greenhouse](https://developers.greenhouse.io/job-board.html) | Listings from configured company boards. Update timestamps are distinguished from publication dates. |
+| Manual entry | Job descriptions pasted into the application. Arbitrary user-provided URLs are not fetched by the server. |
+
+Listings refresh when the application opens or the tab becomes visible. Server responses use a six-hour cache through Netlify CDN and warm function memory. Multiple instances and cold starts can cause additional provider requests; larger deployments may require persistent caching.
+
+The feed covers a subset of the market. Default matching focuses on US and worldwide location fields, with senior titles and known non-US locations hidden. Generic remote locations remain visible with an eligibility reminder. Listings without publication dates remain visible under date filters.
+
+Scores are deterministic skill, experience, title, and location comparisons. They are not ATS scores or hiring probabilities. State restrictions, work authorization, salary, and listing availability must be verified on the source application page. Saved jobs remain in the tracker as historical records after a listing closes.
+
+## Data storage and exports
+
+Profiles, application records, notes, and documents are stored in browser localStorage. The server does not persist candidate profiles or application history. Device synchronization is not included; JSON export and import support manual transfers.
+
+PDFs are generated as selectable text on the device using jsPDF. Longer documents may span multiple pages, and built-in font support is limited. Opening an application link does not change tracking status; submitted applications are marked manually.
+
+The interface, date formatting, accessibility labels, server messages, and generated document notes use English. User-authored content and third-party job descriptions retain their original language.
+
+### Repository hygiene
+
+`.gitignore` excludes dependencies, build output, caches, environment secrets, credential files, personal documents, profile exports, and backups. Additional private files can be stored in `.private/`.
+
+`package-lock.json`, `.env.example` with placeholder values, and application source files remain tracked. Ignore rules do not remove files already committed or erase historical copies.
+
+## Project structure
+
+```text
+src/
+  main.tsx          Application UI, tracking, document editor, and profile settings
+  data.ts           Types, generic profile template, and storage helpers
+  lib.js            Matching, normalization, URL validation, and template generation
+  pdf.ts            Client-side document exports
+  style.css         Responsive styles
+netlify/functions/
+  jobs.mjs          Provider aggregation, caching, and partial failure handling
+  generate.mjs      Protected Gemini generation endpoint
+  config.mjs        AI availability flag without secret values
+tests/
+  matching.test.mjs Matching, data handling, and authorization tests
 ```
 
-## AI desteği (isteğe bağlı)
+## Limitations
 
-Anahtar olmadan ilanlar, takip, ilan ekleme, CV maddelerini ilana göre sıralama, şablon cover letter, düzenleme ve PDF/TXT indirme çalışır. Anahtarsız taslak bir dil modeli değildir.
+- No background scanning, notifications, or automatic application submission.
+- No accounts, database, or automatic cross-device synchronization.
+- Provider coverage, classification, and availability can vary.
+- AI output can contain mistakes and requires review.
+- Live Gemini generation requires separate credentials; automated tests cover authorization and configuration failure paths without calling the provider.
 
-AI ile yeniden yazma için:
+## Additional documentation
 
-1. Google AI Studio'dan Gemini API anahtarı oluştur.
-2. Netlify proje ayarlarında Environment variables bölümüne `GEMINI_API_KEY` ekle.
-3. Güçlü, rastgele ve kendine özel bir `APP_ACCESS_TOKEN` belirle; örneğin parola yöneticisinde 32+ karakter üret. Aynı isimle Netlify ortam değişkeni ekle.
-4. İsteğe bağlı `GEMINI_MODEL`: varsayılan `gemini-3.5-flash-lite`. Hesabında kullanılabilir bir GenerateContent model adı seçebilirsin.
-5. Değişkenlerin Functions kapsamında kullanılabildiğinden emin ol, yeniden deploy et.
-6. Uygulamanın Profil ekranındaki AI erişim koduna `APP_ACCESS_TOKEN` değerini gir. Buraya Gemini API anahtarını girme.
-7. Belgeler ekranında **AI ile uyarla** seç. Belgeyi kontrol edip düzenle ve PDF indir.
-
-Yerelde `.env.example` dosyasını `.env` olarak kopyalayabilirsin. Gerçek anahtarları Git'e koyma. Hiçbir sır `VITE_` önekiyle tanımlanmamalı. Erişim kodu sadece sessionStorage'da; Gemini anahtarı yalnızca sunucudadır. Kod bir kullanıcı hesabı sistemi değildir. AI profil/CV ve seçili ilan metnini Google'a gönderir. Bu sürümle gerçek sağlayıcı çağrısı anahtar verilmediği için doğrulanmadı; endpoint auth ve hata durumları test edildi. Model yanıtları yine kullanıcı tarafından doğrulanmalıdır.
-
-## İlan kaynakları
-
-- **Himalayas**: ABD filtreli `frontend`, `react`, `next.js` aramalarının ilk 20 sonucu; kopyalar birleştirilir. Yayın/sona erme tarihleri kullanılır. `applicationLink` değiştirilmez; görünür kaynak linki korunur. İsteğe bağlı `HIMALAYAS_API_KEY` ile daha yüksek kota.
-- **Remotive**: software-dev akışı; React/frontend ile ilgili roller seçilir. Kaynak şartları gereği 24 saat gecikmeli ilanlar ve Remotive bağlantısı kullanılır.
-- **Greenhouse**: varsayılan `lumimeds,onetrust`. İsteğe bağlı `GREENHOUSE_BOARDS` ortam değişkenine virgülle ayrılmış board token'ları ekleyebilirsin. En fazla 5 şirket. Burada `updated_at` yayın tarihi sayılmaz.
-- **Elle ekleme**: diğer kaynaklardan bulduğun ilanın URL, şirket, başlık ve açıklamasını ekle. Uygulama keyfi URL'lerden sunucu tarafında içerik çekmez.
-
-Arayüz ve sunucu yanıtı 6 saatlik kaynak önbelleği kullanır; uygulama açılınca / sekmeye dönünce kontrol edilir. Netlify CDN cache global isteği azaltır, süreç içi cache warm instance için ek koruma sağlar. Cold start veya birden fazla instance sağlayıcıya ek istek doğurabilir; ticari/toplu kullanım için kalıcı cache gerekir. Uygulama kapalıyken tarama, bildirim veya otomatik başvuru yapmaz.
-
-Tüm ABD/Michigan ilanlarını kapsamaz. Kaynak konumu ABD/dünya geneli olanlar öne alınır; gerçek eyalet ve çalışma izni şartlarını ilandan doğrula. Kaynaklar eksik veya hatalı sınıflandırılmış olabilir. Maaşlar kaynağın beyanıdır. İlan açık mı, ücret ve başvuru koşulları doğru mu son sayfadan kontrol et. Geçmişte kaydettiğin ilan kapanmış olsa da takip defterinde geçmiş kaydı kalır.
-
-Uyum puanı sadece kodda açıkça tanımlanan beceri/deneyim/konum kurallarından oluşur; ATS puanı veya işe alınma ihtimali değildir. Senior unvanlar varsayılan gizli; bilinen yabancı konumlar varsayılan gizli. “Remote” gibi belirsiz konumlar teyit uyarısıyla gösterilir. Yayın tarihi olmayan ilanlar tarih filtresinde görünmeye devam eder.
-
-## Veriler ve PDF
-
-Profil, başvurular, notlar ve belgeler tarayıcı localStorage'ında. Sunucuda aday profili veya geçmiş tutulmaz. Cihazlar arası senkronizasyon yok; JSON yedekleme ve içe aktarma var. Varsayılan kaynakta profesyonel deneyim örneği bulunur, özel e-posta/telefon yoktur; bunları cihazındaki Profil ekranına gir. AI endpoint'i yalnızca istek sırasında bu verileri işler.
-
-PDF'ler jsPDF ile metin olarak cihazda üretilir. Düzenlenmiş belgenin uzunluğuna göre birden fazla sayfa olabilir. Temel CV İngilizce içindir; Türkçe karakterler PDF çıktısında Latin karşılıklarına dönüştürülür. E-posta/telefon boşsa yer tutucuları doldur. Dosyayı işverene göndermeden önce gözden geçir. Başvuru bağlantısını açmak otomatik olarak “başvuruldu” yapmaz.
-
-## Dosyalar
-
-- `src/main.tsx`: mobil arayüz, takip, belge editörü, profil.
-- `src/lib.js`: eşleştirme, temizleme, URL doğrulama, anahtarsız taslaklar.
-- `netlify/functions/jobs.mjs`: kaynak birleştirme, cache, hata toleransı.
-- `netlify/functions/generate.mjs`: korumalı Gemini isteği.
-- `tests/matching.test.mjs`: kritik eşleşme ve auth kontrolleri.
-
-## Referanslar
-
-- https://himalayas.app/api
-- https://github.com/remotive-com/remote-jobs-api
-- https://developers.greenhouse.io/job-board.html
-- https://ai.google.dev/api/generate-content
-- https://ai.google.dev/gemini-api/docs/models
-- https://docs.netlify.com/deploy/create-deploys/
-- https://docs.netlify.com/manage/accounts-and-billing/billing/billing-for-credit-based-plans/credit-based-pricing-plans/
+- [Verification notes](VERIFICATION.md)
+- [Netlify deployment documentation](https://docs.netlify.com/deploy/create-deploys/)
+- [Gemini GenerateContent API](https://ai.google.dev/api/generate-content)

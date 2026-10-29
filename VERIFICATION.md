@@ -1,10 +1,22 @@
-# Doğrulama
+# Verification
 
-- `npm test`: 11 test geçti. Eşleştirme, kaynak konumu, güvenli URL, HTML temizleme, tekrarları ayıklama, mevcut CV iddialarının korunması ve AI yetkilendirme kontrolleri.
-- `npm run build`: TypeScript ve Vite production build başarılı.
-- Canlı `jobs` fonksiyonu: Himalayas, Remotive ve iki Greenhouse board'undan başarılı yanıt alındı. Sonuç sayısı ve içerik kaynağa/tarihe göre değişir.
-- 390 px mobil viewport: belge genişliği 390 px, yatay taşma yok. Mobil alt gezinme, ilan detayı, kaydetme, cover letter üretimi ve resume sıralama tarayıcıda denendi.
-- Her iki belge türü arayüzden PDF olarak indirildi. Örnek çıktılar tek sayfa, metin seçilebilir ve sayfa düzeni görsel olarak kontrol edildi.
-- Son temiz sayfa yüklemesinde tarayıcı hata kaydı yok.
-- Gerçek Gemini üretimi, API anahtarı sağlanmadığı için test edilmedi. Yetkilendirme ve yapılandırma hata durumları test edildi.
-- Netlify hesabına dağıtım yapılmadı; Netlify ortamında uçtan uca deployment doğrulaması henüz yapılmış değil.
+## Original functionality checks
+
+- Matching, location eligibility, safe URLs, HTML cleanup, deduplication, preservation of existing resume claims, and AI authorization are covered by automated tests.
+- The live jobs handler returned responses from Himalayas, Remotive, and two configured Greenhouse boards. Results vary with source availability and publication dates.
+- The interface was checked at a 390 px mobile viewport with no horizontal overflow. Mobile navigation, job details, bookmarking, cover letter templates, and resume bullet reordering were exercised in the browser.
+- Both document types were downloaded through the interface. The sample PDF files were single-page documents with selectable text and were visually inspected.
+- The final clean browser load had no new console errors.
+
+## English-language update
+
+- Interface copy, accessibility labels, notifications, confirmations, date formatting, source explanations, server errors, and template notes were translated into English.
+- The AI instruction now explicitly requests explanatory notes in English as well as the generated document.
+- HTML language and application metadata are set to English.
+- README and verification documentation are in English.
+- Existing user-authored content and third-party job descriptions are preserved.
+- TypeScript compilation, production build, and automated tests are rerun after the update.
+
+## Verification limits
+
+Live Gemini generation has not been tested because no API key was provided. Authorization and configuration failure paths are tested. No deployment has been made or verified in the user's Netlify account.

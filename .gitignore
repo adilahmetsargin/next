@@ -1,7 +1,55 @@
+# Dependencies
 node_modules/
+
+# Build output and generated caches
 dist/
+build/
+coverage/
+.vite/
+.cache/
 .netlify/
+*.tsbuildinfo
+
+# Environment variables and credentials
 .env
 .env.*
 !.env.example
-*.tsbuildinfo
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+service-account*.json
+
+# Private candidate data and application exports
+.private/
+private/
+local-data/
+backups/
+exports/
+Adil-Next-Role-Profile.json
+*-profile.json
+*-Profile.json
+*-backup.json
+*-Backup.json
+*.pdf
+*.doc
+*.docx
+*.rtf
+*[Rr]esume*.txt
+*[Rr]esume*.json
+*[Cc]over-[Ll]etter*.txt
+*[Cc]over-[Ll]etter*.json
+
+# Logs and local editor / operating system files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo

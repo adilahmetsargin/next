@@ -12,6 +12,6 @@ export default defineConfig(({ mode }) => {
  try {let body='';for await(const chunk of req){body+=chunk;if(body.length>150000){res.statusCode=413;res.end('Too large');return;}}
  const out=await fn({httpMethod:req.method,body,headers:req.headers});res.statusCode=out.statusCode;
  for(const [k,v]of Object.entries(out.headers||{}))res.setHeader(k,String(v));res.end(out.body);
- }catch{res.statusCode=500;res.end(JSON.stringify({error:'Yerel sunucu hatası.'}));}
+ }catch{res.statusCode=500;res.end(JSON.stringify({error:'Local server error.'}));}
  });}}]};
 });

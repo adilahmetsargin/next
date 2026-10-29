@@ -2,7 +2,7 @@ export function downloadText(name:string,text:string,type='text/plain'){const u=
 export async function exportPdf(text:string,name:string){
  const { jsPDF } = await import('jspdf');
  const pdf=new jsPDF({unit:'pt',format:'letter'});let y=44;const margin=42;const width=528;
- const clean=text.replace(/[–—]/g,'-').replace(/[’‘]/g,"'").replace(/[“”]/g,'"').replace(/•/g,'-').replace(/ı/g,'i').replace(/İ/g,'I').replace(/ğ/g,'g').replace(/Ğ/g,'G').replace(/ş/g,'s').replace(/Ş/g,'S');
+ const clean=text.replace(/[–—]/g,'-').replace(/[’‘]/g,"'").replace(/[“”]/g,'"').replace(/•/g,'-').replace(/\u0131/g,'i').replace(/\u0130/g,'I').replace(/\u011f/g,'g').replace(/\u011e/g,'G').replace(/\u015f/g,'s').replace(/\u015e/g,'S');
  const lines=clean.split('\n');
  for(let index=0;index<lines.length;index++){const line=lines[index];if(!line.trim()){y+=7;continue;}
  const heading=line===line.toUpperCase()&&/[A-Z]/.test(line)&&line.length<65;
