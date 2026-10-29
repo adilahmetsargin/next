@@ -1,0 +1,1 @@
+export async function handler(){return {statusCode:200,headers:{'Content-Type':'application/json','Cache-Control':'no-store'},body:JSON.stringify({aiEnabled:!!(process.env.GEMINI_API_KEY&&process.env.APP_ACCESS_TOKEN)})};}
